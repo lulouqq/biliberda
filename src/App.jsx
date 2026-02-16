@@ -195,7 +195,7 @@ function App() {
 
     canvas.addEventListener("touchstart", startDraw, { passive: false });
     canvas.addEventListener("touchmove", draw, { passive: false });
-    canvas.addEventListener("touchend", endDraw);
+    canvas.addEventListener("touchend", endDraw, { passive: false });
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);
