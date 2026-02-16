@@ -131,6 +131,7 @@ function App() {
     };
 
     const startDraw = (e) => {
+      e.preventDefault();
       if(!mapRef.current) return;
 
       currentLineRef.current = [];
@@ -146,6 +147,7 @@ function App() {
     };
 
     const draw = (e) => {
+      e.preventDefault();
       if(!mapRef.current) return;
       if (!drawing.current) return;
       if (!geoPos.current) return;
@@ -191,8 +193,8 @@ function App() {
     canvas.addEventListener("mouseup", endDraw);
     canvas.addEventListener("mouseleave", endDraw);
 
-    canvas.addEventListener("touchstart", startDraw);
-    canvas.addEventListener("touchmove", draw);
+    canvas.addEventListener("touchstart", startDraw, { passive: false });
+    canvas.addEventListener("touchmove", draw, { passive: false });
     canvas.addEventListener("touchend", endDraw);
 
     return () => {
