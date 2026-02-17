@@ -130,6 +130,11 @@ function App() {
       };
     };
 
+    const getEventPoint = (e) => {
+      // если touch — берем первый палец, иначе обычный event
+      return e.touches ? e.touches[0] : e;
+    };
+
     const startDraw = (e) => {
       //alert("touchstart");
       e.preventDefault();
@@ -137,7 +142,8 @@ function App() {
 
       currentLineRef.current = [];
 
-      const point = mapRef.current.mouseEventToContainerPoint(e);
+      const src = getEventPoint(e);
+      const point = mapRef.current.mouseEventToContainerPoint(src);
       const latlng = mapRef.current.containerPointToLatLng(point);
       console.log("latlng: ", latlng);
 
@@ -150,10 +156,11 @@ function App() {
     const draw = (e) => {
       e.preventDefault();
       if(!mapRef.current) return;
-      if (!drawing.current) return;
-      //if (!geoPos.current) return;
+      if(!drawing.current) return;
+      if(!geoPos.current) return;
 
-      const point = mapRef.current.mouseEventToContainerPoint(e);
+      const src = getEventPoint(e);
+      const point = mapRef.current.mouseEventToContainerPoint(src);
       const latlng = mapRef.current.containerPointToLatLng(point);
       const pos = getPos(e);
 
