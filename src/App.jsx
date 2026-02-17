@@ -131,7 +131,7 @@ function App() {
     };
 
     const startDraw = (e) => {
-      alert("touchstart");
+      //alert("touchstart");
       e.preventDefault();
       if(!mapRef.current) return;
 
