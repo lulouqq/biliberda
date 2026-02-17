@@ -151,7 +151,7 @@ function App() {
       e.preventDefault();
       if(!mapRef.current) return;
       if (!drawing.current) return;
-      if (!geoPos.current) return;
+      //if (!geoPos.current) return;
 
       const point = mapRef.current.mouseEventToContainerPoint(e);
       const latlng = mapRef.current.containerPointToLatLng(point);
