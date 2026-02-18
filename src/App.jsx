@@ -12,6 +12,7 @@ function App() {
   const geoPos = useRef(null);
   const RADIUS_METERS = 50;
   const circleRef = useRef(null);
+  const hasCenteredRef = useRef(false);
 
   useEffect(() => {
     if(mapRef.current){
@@ -45,6 +46,10 @@ function App() {
       (pos) => {
         geoPos.current = pos.coords;
         const userLatLng = L.latLng(geoPos.current.latitude, geoPos.current.longitude);
+        if(!hasCenteredRef.current){
+          mapRef.current.setView(userLatLng, 17);
+          hasCenteredRef.current = true;
+        }
         console.log("Geo update: ", geoPos);
 
         if(!circleRef.current){
