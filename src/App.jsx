@@ -47,7 +47,7 @@ function App() {
         geoPos.current = pos.coords;
         const userLatLng = L.latLng(geoPos.current.latitude, geoPos.current.longitude);
         if(!hasCenteredRef.current){
-          mapRef.current.setView(userLatLng, 20);
+          mapRef.current.setView(userLatLng, 18);
           hasCenteredRef.current = true;
         }
         console.log("Geo update: ", geoPos);
