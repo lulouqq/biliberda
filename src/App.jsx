@@ -14,6 +14,12 @@ function App() {
   const circleRef = useRef(null);
   const hasCenteredRef = useRef(false);
 
+  function goToUser(){
+    if (!geoPos.current) return;
+    const userLatLng = L.latLng(geoPos.current.latitude, geoPos.current.longitude);
+    mapRef.current.setView(userLatLng, 17);
+  }
+
   useEffect(() => {
     if(mapRef.current){
       mode === "draw"
@@ -225,6 +231,12 @@ function App() {
       <button 
         style={{position: "absolute", top: 100, left: 10, zIndex: 2000}}
         onClick={mode === "draw" ? () => setMode("move") : () => setMode("draw")}>
+      </button>
+      <button
+        style={{ position: "absolute", top: 150, left: 10, zIndex: 2000 }}
+        onClick={goToUser}
+      >
+        📍
       </button>
       <canvas
         ref={canvasRef}
