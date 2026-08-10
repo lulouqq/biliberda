@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import L, { latLng } from "leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 function App() {
@@ -30,8 +30,10 @@ function App() {
 
   useEffect(() => {
     // --- ИНИЦИАЛИЗАЦИЯ КАРТЫ ---
-    mapRef.current = L.map("map").setView(
-      [59.9343, 30.3351], // СПб
+    mapRef.current = L.map("map", {
+      zoomAnimation: false
+    }).setView(
+      [-33.8688, 151.2093], // СПб
       12
     );
 
@@ -48,29 +50,43 @@ function App() {
     }).addTo(mapRef.current);
 
     //--- ГЕО ---
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        geoPos.current = pos.coords;
-        const userLatLng = L.latLng(geoPos.current.latitude, geoPos.current.longitude);
-        if(!hasCenteredRef.current){
-          mapRef.current.setView(userLatLng, 17);
-          hasCenteredRef.current = true;
-        }
-        console.log("Geo update: ", geoPos);
 
-        if(!circleRef.current){
-          circleRef.current = L.circle(userLatLng, 
-          {radius: RADIUS_METERS});
-          circleRef.current.addTo(mapRef.current);
-        }else{
-          circleRef.current.setLatLng(userLatLng);
-        }
+    function handleGeoUpdate(pos) {
+      // Обновляем актуальные координаты пользователя
+      geoPos.current = pos.coords;
 
-        redraw();
-      },
-      (err) => {
-        console.log("geo error:", err.code, err.message);
+      const { latitude, longitude } = pos.coords;
+
+      const userLatLng = L.latLng(latitude, longitude);
+
+      // Центрируем карту только при первом получении позиции
+      if(!hasCenteredRef.current){
+        mapRef.current.setView(userLatLng, 17);
+        hasCenteredRef.current = true;
       }
+
+      // DEBUG: лог обновления геопозиции
+      // console.log("Geo update:", geoPos);
+
+      // Создаём круг один раз, далее только обновляем его позицию
+      if(!circleRef.current){
+        circleRef.current = L.circle(userLatLng, 
+        {radius: RADIUS_METERS});
+        circleRef.current.addTo(mapRef.current);
+      }else{
+        circleRef.current.setLatLng(userLatLng);
+      }
+
+      // Перерисовываем canvas с учётом новой позиции
+      redraw();
+    }
+
+    function handleGeoError(err) {
+      console.log("Geolocation error:", err.code, err.message);
+    }
+    const watchId = navigator.geolocation.watchPosition(
+      handleGeoUpdate,
+      handleGeoError
     );
 
     // --- CANVAS ---
@@ -113,6 +129,9 @@ function App() {
         ctx.stroke();
       }
     };
+
+    mapRef.current.on("zoom", redraw);
+    mapRef.current.on("zoomend", redraw);
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -219,6 +238,10 @@ function App() {
     return () => {
       window.removeEventListener("resize", resizeCanvas);
       navigator.geolocation.clearWatch(watchId);
+      if (mapRef.current) {
+        mapRef.current.off("zoom", redraw);
+        mapRef.current.off("zoomend", redraw);
+      }
     };
   }, []);
 
